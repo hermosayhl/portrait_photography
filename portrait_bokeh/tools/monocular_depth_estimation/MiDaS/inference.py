@@ -51,7 +51,7 @@ def convert_to_tensor(x):
 	return x
 
 # 读取图像
-image_path = "./input/a0015-DSC_0081.png"
+image_path = "./demo.png"
 image = cv2.imread(image_path)
 height, width, _ = image.shape
 
@@ -69,9 +69,9 @@ depth_estimation = cv2.resize(depth_estimation[0], (width, height), interpolatio
 print("depth_estimation  ", depth_estimation.shape)
 
 # 保存
-numpy.save("./output/onnx_result.npy", depth_estimation)
-
+numpy.save("./onnx_result.npy", depth_estimation)
 
 # 可视化
 depth_visualize = depth_to_image(depth_estimation, False)
+cv2.imwrite("./depth.png", depth_visualize)
 cv_show(depth_visualize)
