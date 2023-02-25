@@ -38,19 +38,13 @@ def depth_to_image(depth, grayscale=False, bits=2):
 # python -m onnxsim MiDas-tiny.onnx MiDas-tiny-sim.onnx
 # 加载 onnx 模型
 task = onnxruntime.InferenceSession(
-	"./MiDas-tiny-sim.onnx",
+	"./MiDas-tiny-preproc-sim.onnx",
 	providers=["CPUExecutionProvider"])
 
 
 def convert_to_tensor(x):
-	x = cv2.cvtColor(x, cv2.COLOR_BGR2RGB)
 	x = cv2.resize(x, (256, 256), interpolation=cv2.INTER_CUBIC)
-	x = x.astype("float32") / 255.0
-	# 归一化很容易忘记
-	x = (x - numpy.array([0.485, 0.456, 0.406], dtype="float32")) / numpy.array([0.229, 0.224, 0.225], dtype="float32")
-	x = numpy.ascontiguousarray(x.transpose(2, 0, 1))
-	x = numpy.expand_dims(x, axis=0)
-	return x
+	return x[None]
 
 # 读取图像
 image_path = "./demo.png"

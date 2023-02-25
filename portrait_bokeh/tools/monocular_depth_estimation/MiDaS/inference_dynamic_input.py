@@ -38,40 +38,30 @@ def depth_to_image(depth, grayscale=False, bits=2):
 # python -m onnxsim MiDas-tiny.onnx MiDas-tiny-sim.onnx
 # 加载 onnx 模型
 task = onnxruntime.InferenceSession(
-	"./MiDas-tiny-sim.onnx",
+	"./MiDas-tiny-preproc-dynamic_input-sim.onnx",
 	providers=["CPUExecutionProvider"])
 
 
-def convert_to_tensor(x):
-	x = cv2.cvtColor(x, cv2.COLOR_BGR2RGB)
-	x = cv2.resize(x, (256, 256), interpolation=cv2.INTER_CUBIC)
-	x = x.astype("float32") / 255.0
-	# 归一化很容易忘记
-	x = (x - numpy.array([0.485, 0.456, 0.406], dtype="float32")) / numpy.array([0.229, 0.224, 0.225], dtype="float32")
-	x = numpy.ascontiguousarray(x.transpose(2, 0, 1))
-	x = numpy.expand_dims(x, axis=0)
-	return x
-
 # 读取图像
-image_path = "./demo.png"
+image_path = "./demo2.png"
 image = cv2.imread(image_path)
 height, width, _ = image.shape
 
 # numpy -> tensor
-image_tensor = convert_to_tensor(image)
+image_tensor = numpy.expand_dims(image, axis=0)
 print("image_tensor  ", image_tensor.shape)
 
 # 推理
 [depth_estimation] = task.run(["depth"], {"monocular_image": image_tensor})
 print("depth_estimation  ", depth_estimation.shape, depth_estimation.min(), depth_estimation.max(), depth_estimation.mean(), depth_estimation.std())
-# depth_estimation   (1, 256, 256) 0.0 2274.751 1178.8468 817.0026
+# depth_estimation   (1, 256, 256) 0.0 2269.7942 1175.3344 818.6526
 
 # 放缩到原始大小
 depth_estimation = cv2.resize(depth_estimation[0], (width, height), interpolation=cv2.INTER_CUBIC)
 print("depth_estimation  ", depth_estimation.shape)
 
 # 保存
-numpy.save("./onnx_result.npy", depth_estimation)
+# numpy.save("./onnx_result.npy", depth_estimation)
 
 # 可视化
 depth_visualize = depth_to_image(depth_estimation, False)
