@@ -13,7 +13,7 @@ def cv_show(image):
 
 # 加载模型
 task = onnxruntime.InferenceSession(
-	"modnet_photographic_portrait_matting.onnx",
+	"modnet_portrait_matting.onnx",
 	providers=["CPUExecutionProvider"])
 
 # 读取图像
@@ -43,8 +43,6 @@ print("image_tensor  ", image_tensor.shape)
 # 推理
 [matting_result] = task.run(["output"], {"input": image_tensor})
 print("matting_result   ", matting_result.shape, matting_result.min(), matting_result.max())
-
-
 
 # 后处理
 matting_result = numpy.squeeze(matting_result)
