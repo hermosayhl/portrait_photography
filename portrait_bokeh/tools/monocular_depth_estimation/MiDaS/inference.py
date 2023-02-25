@@ -45,9 +45,11 @@ task = onnxruntime.InferenceSession(
 def convert_to_tensor(x):
 	x = cv2.cvtColor(x, cv2.COLOR_BGR2RGB)
 	x = cv2.resize(x, (256, 256), interpolation=cv2.INTER_CUBIC)
+	x = x.astype("float32") / 255.0
+	# 归一化很容易忘记
+	x = (x - numpy.array([0.485, 0.456, 0.406], dtype="float32")) / numpy.array([0.229, 0.224, 0.225], dtype="float32")
 	x = numpy.ascontiguousarray(x.transpose(2, 0, 1))
 	x = numpy.expand_dims(x, axis=0)
-	x = x.astype("float32") / 255.0
 	return x
 
 # 读取图像
